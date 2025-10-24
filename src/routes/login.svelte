@@ -1,8 +1,10 @@
 <script context="module">
-    export async function preload({ params }, { query }) {
-        if (token) {
-            this.required(302, '/');
+    export async function preload(page, session) {
+        const user = session && session.user;
+        if (user && user.username) {
+            this.required(302, '/overview');
         }
+       
     }
     
 </script>
@@ -27,7 +29,7 @@
         console.log('Login response:', response);
 		if (response.token) {
 			$session.token = response.token;
-			goto('/');
+			goto('/overview');
 		}
 	}
 </script>
