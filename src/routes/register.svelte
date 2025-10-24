@@ -1,7 +1,7 @@
 <script>
 	import { goto, stores } from '@sapper/app';
 	import ListErrors from '../_components/ListErrors.svelte';
-	import { post } from '../node_modules/utils.js';
+	import * as api from 'api.js';
 
 	const { session } = stores();
 
@@ -11,14 +11,17 @@
 	let errors = null;
 
 	async function submit(event) {
-		const response = await post(`auth/register`, { username, name, password });
+		try {
+			const response = await post(`auth/register`, { username, name, password });
 
-		// TODO handle network errors
-		errors = response.errors;
-
-		if (response.user) {
-			$session.user = response.user;
-			goto('/');
+			if (response.errors) {
+				errors = response.errors;
+			} else if (response.user) {
+				$session.user = response.user;
+				goto('/');
+			}
+		} catch (err) {
+			errors = { server: [err.message] };
 		}
 	}
 </script>
@@ -36,7 +39,9 @@
 					<a href="/login">Have an account?</a>
 				</p>
 
-				<ListErrors {errors}/>
+				{#if errors}
+					<div class="alert alert-danger" role="alert"><ListErrors {errors}/></div>
+				{/if}
 
 				<form on:submit|preventDefault={submit}>
 					<fieldset class="form-group">

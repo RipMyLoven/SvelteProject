@@ -1,3 +1,9 @@
+<script context="module">
+	export async function preload({ params, query }) {
+		return {};
+	}
+</script>
+
 <script>
 	import Nav from '../components/Nav.svelte';
 
